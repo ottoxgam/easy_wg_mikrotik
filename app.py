@@ -295,6 +295,9 @@ def clients_create():
     keepalive = request.form.get('persistent_keepalive', '').strip()
     dns = request.form.get('dns', '').strip() or None
     name_input = request.form.get('client_name', '').strip()
+    comment = request.form.get('comment', '').strip()
+    client_keepalive = request.form.get('client_keepalive_new', '').strip()
+    client_listen_port = request.form.get('client_listen_port_new', '').strip()
 
     if not iface:
         flash(_t('flash.interface_required'), 'error')
@@ -323,11 +326,13 @@ def clients_create():
 
         extra = {
             'private-key': priv_key,
+            'comment': comment,
             'client-address': client_addr,
             'client-endpoint': endpoint,
             'client-allowed-address': allowed_ips,
-            'client-keepalive': keepalive,
+            'client-keepalive': client_keepalive or keepalive,
             'client-dns': dns or '',
+            'client-listen-port': client_listen_port,
         }
         ok, err = svc.register_peer(api, pub_key, client_addr, client_name, iface, keepalive, extra)
         svc.close(api)
