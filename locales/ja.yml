@@ -80,7 +80,7 @@ ja:
       title: "ネットワーク設定"
       endpoint_label: "サーバーエンドポイント"
       endpoint_placeholder: "your-server.com:51820"
-      endpoint_note: "🌐 パブリックIPまたはドメイン:ポート"
+      endpoint_note: "🌐 パブリックIPまたはドメイン名"
       allowed_ips_label: "許可されたIP範囲"
       allowed_ips_placeholder: "0.0.0.0/0 または 192.168.1.0/24"
       allowed_ips_note: "🔒 クライアントがアクセスできるネットワーク"

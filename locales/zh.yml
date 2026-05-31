@@ -80,7 +80,7 @@ zh:
       title: "网络配置"
       endpoint_label: "服务器端点"
       endpoint_placeholder: "your-server.com:51820"
-      endpoint_note: "🌐 公网 IP 或域名:端口"
+      endpoint_note: "🌐 公网 IP 或域名"
       allowed_ips_label: "允许的 IP 范围"
       allowed_ips_placeholder: "0.0.0.0/0 或 192.168.1.0/24"
       allowed_ips_note: "🔒 客户端可访问的网络"

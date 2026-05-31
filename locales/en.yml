@@ -103,7 +103,7 @@ en:
       title: "Network Configuration"
       endpoint_label: "Server Endpoint"
       endpoint_placeholder: "your-server.com:51820"
-      endpoint_note: "🌐 Public IP or domain:port"
+      endpoint_note: "🌐 Public IP or domain name"
       allowed_ips_label: "Allowed IP Ranges"
       allowed_ips_placeholder: "0.0.0.0/0 or 192.168.1.0/24"
       allowed_ips_note: "🔒 Networks that client can access"

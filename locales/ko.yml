@@ -80,7 +80,7 @@ ko:
       title: "네트워크 설정 구성"
       endpoint_label: "서버 엔드포인트"
       endpoint_placeholder: "your-server.com:51820"
-      endpoint_note: "🌐 공인 IP 또는 도메인:포트"
+      endpoint_note: "🌐 공인 IP 또는 도메인"
       allowed_ips_label: "허용된 IP 대역"
       allowed_ips_placeholder: "0.0.0.0/0 또는 192.168.1.0/24"
       allowed_ips_note: "🔒 클라이언트가 접근할 수 있는 네트워크"
