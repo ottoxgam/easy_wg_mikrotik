@@ -81,14 +81,17 @@
                  {{ 'hidden' if not peer.get('persistent-keepalive') else '' }}">
         </div>
         <div class="wg-form-group">
-          <label class="wg-label">{{ t('new_client.config_section.endpoint_label') }} ({{ t('clients.fields.static_endpoint_note') }})</label>
+          <label class="wg-label">{{ t('new_client.config_section.endpoint_label') }}</label>
           <input type="text" name="endpoint_address" value="{{ peer.get('endpoint-address', '') }}"
                  placeholder="host or IP" class="wg-input font-mono">
+          <p class="text-xs text-gray-400 mt-1">{{ t('clients.fields.static_endpoint_note') }}</p>
         </div>
         <div class="wg-form-group">
           <label class="wg-label">{{ t('login.port_label') }}</label>
-          <input type="number" name="endpoint_port" value="{{ peer.get('endpoint-port', '') }}"
-                 min="0" max="65535" placeholder="51820" class="wg-input font-mono">
+          {% set ep_port = peer.get('endpoint-port', '') %}
+          <input type="number" name="endpoint_port"
+                 value="{{ '' if ep_port in ('0', '0', '') else ep_port }}"
+                 min="1" max="65535" placeholder="51820" class="wg-input font-mono">
         </div>
       </div>
     </div>
@@ -136,8 +139,10 @@
         </div>
         <div class="wg-form-group">
           <label class="wg-label">{{ t('clients.fields.client_listen_port') }}</label>
-          <input type="number" name="client_listen_port" value="{{ peer.get('client-listen-port', '') }}"
-                 min="0" max="65535" class="wg-input font-mono">
+          {% set clp = peer.get('client-listen-port', '') %}
+          <input type="number" name="client_listen_port"
+                 value="{{ '' if clp in ('0', '') else clp }}"
+                 min="1" max="65535" class="wg-input font-mono">
         </div>
       </div>
     </div>
