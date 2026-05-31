@@ -21,7 +21,20 @@ from services.mikrotik_api import MikrotikApiService
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24).hex())
+
+
+def _secret_key():
+    if key := os.environ.get('SECRET_KEY'):
+        return key
+    key_file = os.path.join(os.path.dirname(__file__), '.secret_key')
+    if os.path.exists(key_file):
+        return open(key_file).read().strip()
+    key = os.urandom(24).hex()
+    open(key_file, 'w').write(key)
+    return key
+
+
+app.secret_key = _secret_key()
 
 AVAILABLE_LOCALES = ['ko', 'en', 'zh', 'ja']
 _LOCALES = {}

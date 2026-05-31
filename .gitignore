@@ -29,5 +29,8 @@ Thumbs.db
 *.log
 logs/
 
+# Auto-generated secret key
+.secret_key
+
 # Local config
 CLAUDE.md

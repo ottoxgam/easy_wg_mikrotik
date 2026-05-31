@@ -17,11 +17,12 @@ python -m venv venv
 source venv/bin/activate      # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
-cp .env.example .env          # edit as needed
 python app.py
 ```
 
 Open `http://localhost:5000`.
+
+No `.env` file is required. A secret key is auto-generated and saved to `.secret_key` on first run. See `.env.example` for optional overrides (pre-filling the login form, changing the port, etc.).
 
 ## Configuration
 
@@ -38,12 +39,29 @@ Open `http://localhost:5000`.
 
 ## Usage
 
+### Creating a client
+
 1. Log in with your MikroTik credentials
-2. Pick a WireGuard interface — subnet and keepalive are auto-filled from the router
-3. Set an endpoint (`host:port`) and create the client
+2. Pick a WireGuard interface — subnet, keepalive, and endpoint are auto-filled from the router
+3. Fill in any remaining fields and click Create
 4. Scan the QR code or download the `.conf` file
 
-Clients can be deleted from the list view at any time.
+The private key and all client-side settings (`client-endpoint`, `client-dns`, `client-allowed-address`, etc.) are stored on the router at creation time, so the config and QR code can be regenerated later from the peer list.
+
+### Managing clients
+
+- **List** — shows each peer's assigned IP, current endpoint, last handshake, and connection status (Active / Disconnected / Waiting)
+- **Edit** — modify any peer field that RouterOS exposes: name, comment, allowed address, keepalive, preshared key, responder flag, and all client-side config fields
+- **Config / QR** — regenerate the `.conf` file and QR code for any peer that has a stored private key
+- **Delete** — removes the peer from the router
+
+### Connection status
+
+| Badge | Meaning |
+|---|---|
+| Active (green, fast pulse) | Last handshake within 2 minutes |
+| Disconnected (yellow, slow pulse) | Last handshake older than 2 minutes |
+| Waiting (gray, no pulse) | Never connected |
 
 ## Stack
 
