@@ -90,12 +90,12 @@
           <p class="text-xs text-gray-400 mt-1">{{ t('new_client.config_section.subnet_note') }}</p>
         </div>
         <div class="wg-form-group">
-          <div class="flex items-center space-x-2 mb-1">
+          <label for="ka_toggle" class="wg-label flex items-center gap-2 cursor-pointer">
             <input type="checkbox" id="ka_toggle" checked
-                   class="w-4 h-4 text-blue-600 rounded"
+                   class="w-4 h-4 text-blue-600 rounded flex-shrink-0"
                    onchange="toggleKa('ka_input', this)">
-            <label for="ka_toggle" class="wg-label mb-0">{{ t('new_client.config_section.keepalive_label') }}</label>
-          </div>
+            <span>{{ t('new_client.config_section.keepalive_label') }}</span>
+          </label>
           <input type="number" name="persistent_keepalive" id="ka_input"
                  value="25" min="1" max="65535"
                  class="wg-input font-mono">
@@ -140,12 +140,12 @@
           <p class="text-xs text-gray-400 mt-1">{{ t('new_client.config_section.dns_note') }}</p>
         </div>
         <div class="wg-form-group">
-          <div class="flex items-center space-x-2 mb-1">
+          <label for="cka_toggle" class="wg-label flex items-center gap-2 cursor-pointer">
             <input type="checkbox" id="cka_toggle" checked
-                   class="w-4 h-4 text-blue-600 rounded"
+                   class="w-4 h-4 text-blue-600 rounded flex-shrink-0"
                    onchange="toggleKa('cka_input', this)">
-            <label for="cka_toggle" class="wg-label mb-0">{{ t('clients.fields.client_keepalive') }}</label>
-          </div>
+            <span>{{ t('clients.fields.client_keepalive') }}</span>
+          </label>
           <input type="number" name="client_keepalive_new" id="cka_input"
                  value="25" min="1" max="65535"
                  class="wg-input font-mono">

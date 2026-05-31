@@ -68,13 +68,13 @@
                  class="wg-input font-mono" required>
         </div>
         <div class="wg-form-group">
-          <div class="flex items-center space-x-2 mb-1">
+          <label for="ka_toggle" class="wg-label flex items-center gap-2 cursor-pointer">
             <input type="checkbox" id="ka_toggle" value="1"
                    {{ 'checked' if peer.get('persistent-keepalive') else '' }}
-                   class="w-4 h-4 text-blue-600 rounded"
+                   class="w-4 h-4 text-blue-600 rounded flex-shrink-0"
                    onchange="toggleKa('ka_input', this)">
-            <label for="ka_toggle" class="wg-label mb-0">{{ t('new_client.config_section.keepalive_label') }}</label>
-          </div>
+            <span>{{ t('new_client.config_section.keepalive_label') }}</span>
+          </label>
           <input type="number" name="persistent_keepalive" id="ka_input"
                  value="{{ peer.get('persistent-keepalive', '').rstrip('s') }}"
                  min="1" max="65535" class="wg-input font-mono
@@ -127,13 +127,13 @@
                  placeholder="0.0.0.0/0" class="wg-input font-mono">
         </div>
         <div class="wg-form-group">
-          <div class="flex items-center space-x-2 mb-1">
+          <label for="cka_toggle" class="wg-label flex items-center gap-2 cursor-pointer">
             <input type="checkbox" id="cka_toggle" value="1"
                    {{ 'checked' if peer.get('client-keepalive') else '' }}
-                   class="w-4 h-4 text-blue-600 rounded"
+                   class="w-4 h-4 text-blue-600 rounded flex-shrink-0"
                    onchange="toggleKa('cka_input', this)">
-            <label for="cka_toggle" class="wg-label mb-0">{{ t('clients.fields.client_keepalive') }}</label>
-          </div>
+            <span>{{ t('clients.fields.client_keepalive') }}</span>
+          </label>
           <input type="number" name="client_keepalive" id="cka_input"
                  value="{{ peer.get('client-keepalive', '').rstrip('s') }}"
                  min="1" max="65535" class="wg-input font-mono
