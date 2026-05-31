@@ -268,7 +268,10 @@ def clients_new():
             flash(_t('flash.mikrotik_connection_failed'), 'error')
             return redirect(url_for('dashboard'))
         interfaces = svc.fetch_wireguard_interfaces(api)
+        addrs = {a.get('interface'): a.get('address', '') for a in svc.get_ip_addresses(api)}
         svc.close(api)
+        for iface in interfaces:
+            iface['address'] = addrs.get(iface['name'], '')
         if not interfaces:
             flash(_t('flash.no_wireguard_interfaces'), 'error')
             return redirect(url_for('dashboard'))

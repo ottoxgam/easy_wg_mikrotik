@@ -80,7 +80,7 @@
                 {% for iface in wireguard_interfaces %}
                 <option value="{{ iface.name }}"
                         {% if (selected_interface or wireguard_interfaces[0].name) == iface.name %}selected{% endif %}>
-                  🔗 {{ iface.name }}
+                  {{ iface.name }}{% if iface.address %} — {{ iface.address }}{% endif %}{% if iface.listen_port %} · :{{ iface.listen_port }}{% endif %}
                 </option>
                 {% endfor %}
               </select>
