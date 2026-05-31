@@ -166,6 +166,7 @@ ko:
       never_connected: "연결된 적 없음"
       not_set: "설정안함"
       seconds: "초"
+      endpoint: "엔드포인트"
       name: "이름"
       comment: "메모"
       comment_placeholder: "선택 메모"

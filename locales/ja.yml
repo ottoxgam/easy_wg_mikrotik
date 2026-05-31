@@ -166,6 +166,7 @@ ja:
       never_connected: "接続したことがありません"
       not_set: "設定されていません"
       seconds: "秒"
+      endpoint: "エンドポイント"
       name: "名前"
       comment: "コメント"
       comment_placeholder: "任意メモ"

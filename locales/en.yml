@@ -189,6 +189,7 @@ en:
       never_connected: "Never Connected"
       not_set: "Not Set"
       seconds: "sec"
+      endpoint: "Endpoint"
       name: "Name"
       comment: "Comment"
       comment_placeholder: "Optional note"

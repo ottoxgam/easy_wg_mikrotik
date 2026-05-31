@@ -166,6 +166,7 @@ zh:
       never_connected: "从未连接"
       not_set: "未设置"
       seconds: "秒"
+      endpoint: "端点"
       name: "名称"
       comment: "备注"
       comment_placeholder: "可选备注"
