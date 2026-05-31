@@ -1,0 +1,196 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ t('clients.title') }} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  <div class="mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div class="mb-4 sm:mb-0">
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+          {{ t('clients.title') }}
+        </h1>
+        <p class="text-gray-600">{{ t('clients.subtitle') }}</p>
+      </div>
+      <div class="flex space-x-3">
+        <a href="{{ url_for('clients_new', interface=selected_interface) }}"
+           class="group relative px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-md hover:shadow transition-all duration-200">
+          <span class="flex items-center space-x-2">
+            <i class="bi bi-plus-lg" style="font-size:1.25rem;"></i>
+            <span>{{ t('clients.new_client') }}</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white/80 backdrop-blur-lg rounded border border-gray-300 overflow-hidden">
+    <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-300">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4 sm:mb-0 flex items-center space-x-2">
+          <i class="bi bi-router text-purple-600" style="font-size:1.25rem;"></i>
+          <span>{{ t('clients.registered_clients') }}</span>
+        </h2>
+
+        {% if wireguard_interfaces %}
+        <div class="flex items-center space-x-4">
+          <form method="GET" action="{{ url_for('clients_index') }}" class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2">
+              <i class="bi bi-funnel text-gray-500"></i>
+              <label class="text-sm font-semibold text-gray-700">{{ t('clients.filter') }}</label>
+            </div>
+            <select name="interface"
+                    class="px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white transition-all duration-200"
+                    onchange="this.form.submit()">
+              <option value="">{{ t('clients.all_interfaces') }}</option>
+              {% for iface in wireguard_interfaces %}
+              <option value="{{ iface.name }}" {{ 'selected' if selected_interface == iface.name else '' }}>
+                {{ iface.name }}
+              </option>
+              {% endfor %}
+            </select>
+            {% if selected_interface %}
+            <a href="{{ url_for('clients_index') }}"
+               class="px-3 py-2 text-sm text-gray-600 hover:text-purple-600 font-medium transition-colors duration-200">
+              {{ t('clients.reset') }}
+            </a>
+            {% endif %}
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if not peers %}
+    <div class="text-center py-16 px-6">
+      <div class="max-w-sm mx-auto">
+        <div class="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i class="bi bi-hdd-stack text-gray-400" style="font-size:2.5rem;"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ t('clients.no_clients.title') }}</h3>
+        <p class="text-gray-500 mb-6">{{ t('clients.no_clients.description') }}</p>
+        <a href="{{ url_for('clients_new', interface=selected_interface) }}"
+           class="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-md transition-all duration-200">
+          <i class="bi bi-plus-lg mr-2" style="font-size:1.25rem;"></i>
+          <span>{{ t('clients.no_clients.action') }}</span>
+        </a>
+      </div>
+    </div>
+    {% else %}
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% for peer in peers %}
+        <div id="peer_{{ peer['.id'] }}"
+             class="group bg-gradient-to-br from-white to-gray-50 rounded-md border border-gray-300 hover:border-gray-400 transition-all duration-300">
+          <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-md flex items-center justify-center">
+                  <i class="bi bi-person text-white" style="font-size:1.25rem;"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-gray-900">{{ peer.get('name') or peer['.id'] }}</h3>
+                  <p class="text-sm text-gray-500">{{ peer.get('interface', '') }}</p>
+                </div>
+              </div>
+
+              {% if peer.get('last-handshake') %}
+              <div class="flex items-center space-x-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span>{{ t('clients.status.active') }}</span>
+              </div>
+              {% else %}
+              <div class="flex items-center space-x-1 px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">
+                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                <span>{{ t('clients.status.waiting') }}</span>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <i class="bi bi-globe text-gray-400"></i>
+                <span class="text-sm font-medium text-gray-600">{{ t('clients.fields.ip_address') }}</span>
+              </div>
+              <span class="text-sm font-mono font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded">
+                {{ peer.get('allowed-address', '') }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <i class="bi bi-key text-gray-400"></i>
+                <span class="text-sm font-medium text-gray-600">{{ t('clients.fields.public_key') }}</span>
+              </div>
+              <span class="text-xs font-mono text-gray-700 bg-gray-100 px-2 py-1 rounded">
+                {% if peer.get('public-key') %}{{ peer['public-key'][:16] }}...{% endif %}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <i class="bi bi-clock text-gray-400"></i>
+                <span class="text-sm font-medium text-gray-600">{{ t('clients.fields.keep_alive') }}</span>
+              </div>
+              <span class="text-sm font-semibold text-gray-900">
+                {% if peer.get('persistent-keepalive') %}
+                  {{ peer['persistent-keepalive'].rstrip('s') }} {{ t('clients.fields.seconds') }}
+                {% else %}
+                  {{ t('clients.fields.not_set') }}
+                {% endif %}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <i class="bi bi-lightning text-gray-400"></i>
+                <span class="text-sm font-medium text-gray-600">{{ t('clients.fields.last_activity') }}</span>
+              </div>
+              <span class="text-xs text-gray-500">
+                {{ peer.get('last-handshake') or t('clients.fields.never_connected') }}
+              </span>
+            </div>
+          </div>
+
+          <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-xl">
+            <form method="POST" action="{{ url_for('clients_delete') }}"
+                  data-confirm="{{ t('clients.delete_confirm', name=peer.get('name') or peer['.id']) }}"
+                  onsubmit="return confirm(this.dataset.confirm)">
+              <input type="hidden" name="peer_id" value="{{ peer['.id'] }}">
+              {% if selected_interface %}
+              <input type="hidden" name="interface" value="{{ selected_interface }}">
+              {% endif %}
+              <button type="submit"
+                      class="w-full group flex items-center justify-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded transition-all duration-200">
+                <i class="bi bi-trash mr-2 group-hover:animate-pulse"></i>
+                <span>{{ t('clients.delete_client') }}</span>
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-md border border-gray-300">
+        <div class="mb-4 sm:mb-0">
+          <div class="flex items-center space-x-2">
+            <i class="bi bi-bar-chart text-purple-600" style="font-size:1.25rem;"></i>
+            <span class="text-lg font-semibold text-gray-900">
+              {{ t('clients.stats.total', count=peers|length) }}
+            </span>
+          </div>
+          <p class="text-sm text-gray-600 mt-1">{{ t('clients.stats.description') }}</p>
+        </div>
+        <a href="{{ url_for('clients_index', interface=selected_interface) }}"
+           class="group inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-purple-600 font-semibold rounded-md transition-all duration-200">
+          <i class="bi bi-arrow-clockwise mr-2 group-hover:rotate-180 transition-transform duration-300"></i>
+          <span>{{ t('clients.refresh') }}</span>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

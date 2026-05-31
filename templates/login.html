@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ t('login.title') }} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="wg-login-container">
+  <div class="wg-login-card">
+    <div class="wg-login-header">
+      <div class="wg-login-icon">
+        <i class="bi bi-lock text-white" style="font-size:2rem;"></i>
+      </div>
+      <h2 class="wg-login-title">{{ t('login.title') }}</h2>
+      <p class="wg-login-subtitle">{{ t('login.subtitle') }}</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('login') }}" class="space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="wg-form-group sm:col-span-2">
+          <label class="wg-label">
+            <span class="flex items-center space-x-2">
+              <i class="bi bi-hdd-network"></i>
+              <span>{{ t('login.host_label') }}</span>
+            </span>
+          </label>
+          <input type="text" name="mikrotik_host"
+                 value="{{ saved_login.host if saved_login else (mikrotik_host_default or '192.168.1.1') }}"
+                 placeholder="{{ t('login.host_placeholder') }}"
+                 class="wg-input hover:bg-gray-50"
+                 required>
+        </div>
+
+        <div class="wg-form-group">
+          <label class="wg-label">
+            <span class="flex items-center space-x-2">
+              <i class="bi bi-ethernet"></i>
+              <span>{{ t('login.port_label') }}</span>
+            </span>
+          </label>
+          <input type="number" name="mikrotik_port"
+                 value="{{ saved_login.port if saved_login else (mikrotik_port_default or '8728') }}"
+                 class="wg-input hover:bg-gray-50">
+        </div>
+      </div>
+
+      <div class="wg-form-group">
+        <label class="wg-label">
+          <span class="flex items-center space-x-2">
+            <i class="bi bi-person"></i>
+            <span>{{ t('login.username_label') }}</span>
+          </span>
+        </label>
+        <input type="text" name="mikrotik_user"
+               value="{{ saved_login.user if saved_login else '' }}"
+               placeholder="{{ t('login.username_placeholder') }}"
+               class="wg-input hover:bg-gray-50"
+               required>
+      </div>
+
+      <div class="wg-form-group">
+        <label class="wg-label">
+          <span class="flex items-center space-x-2">
+            <i class="bi bi-key"></i>
+            <span>{{ t('login.password_label') }}</span>
+          </span>
+        </label>
+        <input type="password" name="mikrotik_password"
+               class="wg-input hover:bg-gray-50"
+               required>
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <label class="flex items-center space-x-3 cursor-pointer group">
+          <input type="checkbox" name="remember_me" value="1"
+                 {{ 'checked' if saved_login else '' }}
+                 class="w-5 h-5 text-blue-500 bg-gray-100 border-2 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 transition-all duration-200">
+          <span class="text-sm font-medium text-gray-500 group-hover:text-gray-800 transition-colors">
+            {{ t('login.remember_label') }}
+          </span>
+        </label>
+      </div>
+
+      <div class="pt-4">
+        <button type="submit" class="wg-btn-primary w-full py-4 px-6 font-semibold">
+          {{ t('login.login_button') }}
+        </button>
+      </div>
+    </form>
+
+    <div class="mt-8 text-center">
+      <div class="inline-flex items-center space-x-2 px-4 py-2 bg-blue-50/50 rounded-full border border-gray-300">
+        <i class="bi bi-info-circle text-blue-500"></i>
+        <span class="text-sm font-medium text-blue-500">{{ t('login.api_info') }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wg-decorative-bg"></div>
+</div>
+{% endblock %}
