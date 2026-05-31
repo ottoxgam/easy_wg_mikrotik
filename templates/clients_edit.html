@@ -3,58 +3,164 @@
 {% block title %}{{ t('clients.edit_client') }} - {{ t('app.name') }}{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">{{ t('clients.edit_client') }}</h1>
-    <p class="text-sm text-gray-500 mt-1 font-mono">{{ peer.get('public-key', '') }}</p>
+<div class="max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">{{ t('clients.edit_client') }}: {{ peer.get('name', peer['.id']) }}</h1>
+      <p class="text-xs font-mono text-gray-400 mt-1">{{ peer.get('public-key', '') }}</p>
+    </div>
+    {% if peer.get('private-key') %}
+    <a href="{{ url_for('clients_config', peer_id=peer['.id'], interface=back_interface) }}"
+       class="flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-md transition-all duration-200">
+      <i class="bi bi-qr-code-scan"></i>
+      <span>{{ t('clients.view_config') }}</span>
+    </a>
+    {% endif %}
   </div>
 
-  <div class="bg-white/80 backdrop-blur-lg rounded border border-gray-300 overflow-hidden">
-    <form method="POST" action="{{ url_for('clients_update') }}" class="p-8 space-y-6">
-      <input type="hidden" name="peer_id" value="{{ peer['.id'] }}">
-      <input type="hidden" name="interface" value="{{ back_interface or peer.get('interface', '') }}">
+  <form method="POST" action="{{ url_for('clients_update') }}" class="space-y-6">
+    <input type="hidden" name="peer_id" value="{{ peer['.id'] }}">
+    <input type="hidden" name="interface" value="{{ back_interface or peer.get('interface', '') }}">
 
-      <div class="wg-form-group">
-        <label class="wg-label">{{ t('clients.fields.name') }}</label>
-        <input type="text" name="name"
-               value="{{ peer.get('name', '') }}"
-               class="wg-input">
+    {{/* ── Identity ───────────────────────────────── */}}
+    <div class="bg-white/80 rounded border border-gray-300 overflow-hidden">
+      <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex items-center space-x-2">
+        <i class="bi bi-tag text-gray-500"></i>
+        <span class="font-semibold text-gray-700">{{ t('clients.section_identity') }}</span>
+        <span class="text-xs text-gray-400 ml-2">{{ peer.get('interface', '') }} · {{ (peer.get('public-key',''))[:20] }}…</span>
       </div>
+      <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('clients.fields.name') }}</label>
+          <input type="text" name="name" value="{{ peer.get('name', '') }}" class="wg-input" required>
+        </div>
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('clients.fields.comment') }}</label>
+          <input type="text" name="comment" value="{{ peer.get('comment', '') }}"
+                 placeholder="{{ t('clients.fields.comment_placeholder') }}" class="wg-input">
+        </div>
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('clients.fields.preshared_key') }}</label>
+          <input type="password" name="preshared_key"
+                 placeholder="{{ t('clients.fields.preshared_key_placeholder') }}" class="wg-input font-mono">
+          <p class="text-xs text-gray-400 mt-1">{{ t('clients.fields.preshared_key_note') }}</p>
+        </div>
+        <div class="wg-form-group flex items-center space-x-3 pt-6">
+          <input type="hidden" name="responder_sent" value="1">
+          <input type="checkbox" name="responder" id="responder_cb" value="true"
+                 {{ 'checked' if peer.get('responder') == 'true' else '' }}
+                 class="w-4 h-4 text-blue-600 rounded">
+          <label for="responder_cb" class="wg-label mb-0">{{ t('clients.fields.responder') }}</label>
+        </div>
+      </div>
+    </div>
 
-      <div class="wg-form-group">
-        <label class="wg-label">{{ t('clients.fields.comment') }}</label>
-        <input type="text" name="comment"
-               value="{{ peer.get('comment', '') }}"
-               placeholder="{{ t('clients.fields.comment_placeholder') }}"
-               class="wg-input">
+    {{/* ── Router-side network ─────────────────────── */}}
+    <div class="bg-white/80 rounded border border-gray-300 overflow-hidden">
+      <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex items-center space-x-2">
+        <i class="bi bi-router text-gray-500"></i>
+        <span class="font-semibold text-gray-700">{{ t('clients.section_router') }}</span>
       </div>
+      <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('clients.fields.ip_address') }}</label>
+          <input type="text" name="allowed_address" value="{{ peer.get('allowed-address', '') }}"
+                 class="wg-input font-mono" required>
+        </div>
+        <div class="wg-form-group">
+          <div class="flex items-center space-x-2 mb-1">
+            <input type="checkbox" id="ka_toggle" value="1"
+                   {{ 'checked' if peer.get('persistent-keepalive') else '' }}
+                   class="w-4 h-4 text-blue-600 rounded"
+                   onchange="toggleKa('ka_input', this)">
+            <label for="ka_toggle" class="wg-label mb-0">{{ t('new_client.config_section.keepalive_label') }}</label>
+          </div>
+          <input type="number" name="persistent_keepalive" id="ka_input"
+                 value="{{ peer.get('persistent-keepalive', '').rstrip('s') }}"
+                 min="1" max="65535" class="wg-input font-mono
+                 {{ 'hidden' if not peer.get('persistent-keepalive') else '' }}">
+        </div>
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('new_client.config_section.endpoint_label') }} ({{ t('clients.fields.static_endpoint_note') }})</label>
+          <input type="text" name="endpoint_address" value="{{ peer.get('endpoint-address', '') }}"
+                 placeholder="host or IP" class="wg-input font-mono">
+        </div>
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('login.port_label') }}</label>
+          <input type="number" name="endpoint_port" value="{{ peer.get('endpoint-port', '') }}"
+                 min="0" max="65535" placeholder="51820" class="wg-input font-mono">
+        </div>
+      </div>
+    </div>
 
-      <div class="wg-form-group">
-        <label class="wg-label">{{ t('clients.fields.ip_address') }}</label>
-        <input type="text" name="allowed_address"
-               value="{{ peer.get('allowed-address', '') }}"
-               class="wg-input font-mono">
+    {{/* ── Client-side config (stored on router) ───── */}}
+    <div class="bg-white/80 rounded border border-gray-300 overflow-hidden">
+      <div class="px-6 py-3 bg-blue-50 border-b border-blue-100 flex items-center space-x-2">
+        <i class="bi bi-phone text-blue-500"></i>
+        <span class="font-semibold text-blue-700">{{ t('clients.section_client') }}</span>
+        <span class="text-xs text-blue-400 ml-2">{{ t('clients.section_client_note') }}</span>
       </div>
+      <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('clients.fields.client_address') }}</label>
+          <input type="text" name="client_address" value="{{ peer.get('client-address', '') }}"
+                 class="wg-input font-mono">
+        </div>
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('clients.fields.client_endpoint') }}</label>
+          <input type="text" name="client_endpoint" value="{{ peer.get('client-endpoint', '') }}"
+                 placeholder="host:port" class="wg-input font-mono">
+        </div>
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('clients.fields.client_dns') }}</label>
+          <input type="text" name="client_dns" value="{{ peer.get('client-dns', '') }}"
+                 placeholder="1.1.1.1, 8.8.8.8" class="wg-input font-mono">
+        </div>
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('clients.fields.client_allowed_address') }}</label>
+          <input type="text" name="client_allowed_address" value="{{ peer.get('client-allowed-address', '') }}"
+                 placeholder="0.0.0.0/0" class="wg-input font-mono">
+        </div>
+        <div class="wg-form-group">
+          <div class="flex items-center space-x-2 mb-1">
+            <input type="checkbox" id="cka_toggle" value="1"
+                   {{ 'checked' if peer.get('client-keepalive') else '' }}
+                   class="w-4 h-4 text-blue-600 rounded"
+                   onchange="toggleKa('cka_input', this)">
+            <label for="cka_toggle" class="wg-label mb-0">{{ t('clients.fields.client_keepalive') }}</label>
+          </div>
+          <input type="number" name="client_keepalive" id="cka_input"
+                 value="{{ peer.get('client-keepalive', '').rstrip('s') }}"
+                 min="1" max="65535" class="wg-input font-mono
+                 {{ 'hidden' if not peer.get('client-keepalive') else '' }}">
+        </div>
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('clients.fields.client_listen_port') }}</label>
+          <input type="number" name="client_listen_port" value="{{ peer.get('client-listen-port', '') }}"
+                 min="0" max="65535" class="wg-input font-mono">
+        </div>
+      </div>
+    </div>
 
-      <div class="wg-form-group">
-        <label class="wg-label">{{ t('new_client.config_section.keepalive_label') }}</label>
-        <input type="number" name="persistent_keepalive"
-               value="{{ peer.get('persistent-keepalive', '').rstrip('s') }}"
-               min="0" max="65535"
-               class="wg-input font-mono">
-      </div>
-
-      <div class="flex gap-4 pt-2">
-        <button type="submit"
-                class="flex-1 wg-btn-primary py-3 font-semibold">
-          {{ t('clients.save_button') }}
-        </button>
-        <a href="{{ url_for('clients_index', interface=back_interface) }}"
-           class="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-md text-center transition-all duration-200">
-          {{ t('new_client.cancel_button') }}
-        </a>
-      </div>
-    </form>
-  </div>
+    <div class="flex gap-4">
+      <button type="submit" class="flex-1 wg-btn-primary py-3 font-semibold">
+        {{ t('clients.save_button') }}
+      </button>
+      <a href="{{ url_for('clients_index', interface=back_interface) }}"
+         class="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-md text-center transition-all duration-200">
+        {{ t('new_client.cancel_button') }}
+      </a>
+    </div>
+  </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleKa(inputId, cb) {
+  const inp = document.getElementById(inputId);
+  if (cb.checked) { inp.classList.remove('hidden'); if (!inp.value) inp.value = '25'; }
+  else             { inp.classList.add('hidden');    inp.value = ''; }
+}
+</script>
 {% endblock %}

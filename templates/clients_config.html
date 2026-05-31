@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ peer.get('name', peer['.id']) }} Config - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto" data-controller="client-result">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">{{ peer.get('name', peer['.id']) }}</h1>
+      <p class="text-xs font-mono text-gray-400 mt-1">{{ peer.get('interface', '') }} · {{ (peer.get('public-key',''))[:24] }}…</p>
+    </div>
+    <div class="flex gap-3">
+      <a href="{{ url_for('clients_edit', peer_id=peer['.id'], interface=back_interface) }}"
+         class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-md transition-all duration-200 flex items-center space-x-2">
+        <i class="bi bi-pencil"></i><span>{{ t('clients.edit_client') }}</span>
+      </a>
+      <a href="{{ url_for('clients_index', interface=back_interface) }}"
+         class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-md transition-all duration-200 flex items-center space-x-2">
+        <i class="bi bi-arrow-left"></i><span>{{ t('new_client.cancel_button') }}</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="bg-gray-900 rounded-md p-5 border border-gray-700">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">{{ t('client_result.config_file') }}</span>
+      </div>
+      <pre class="text-green-400 font-mono text-xs whitespace-pre-wrap break-all leading-relaxed">{{ client_config }}</pre>
+    </div>
+
+    <div class="bg-white rounded-md border border-gray-300 p-5 flex flex-col items-center">
+      <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">{{ t('client_result.qr_code') }}</span>
+      <div id="qr-code-container">{{ qr_code | safe }}</div>
+    </div>
+  </div>
+
+  <div class="flex flex-col sm:flex-row gap-4">
+    <a href="#"
+       data-action="click->client-result#downloadConfig"
+       data-client-result-client-name-param="{{ peer.get('name', peer['.id']) }}"
+       data-client-result-config-param="{{ client_config }}"
+       class="flex-1 flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-md transition-all duration-200">
+      <i class="bi bi-file-text mr-2"></i>{{ t('client_result.download_config') }}
+    </a>
+    <a href="#"
+       data-action="click->client-result#downloadQR"
+       data-client-result-client-name-param="{{ peer.get('name', peer['.id']) }}"
+       class="flex-1 flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-md transition-all duration-200">
+      <i class="bi bi-qr-code mr-2"></i>{{ t('client_result.download_qr') }}
+    </a>
+  </div>
+</div>
+{% endblock %}

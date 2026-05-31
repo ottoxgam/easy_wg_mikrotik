@@ -299,7 +299,7 @@ def clients_create():
     if not iface:
         flash(_t('flash.interface_required'), 'error')
         return redirect(url_for('clients_new'))
-    if not all([endpoint, allowed_ips, subnet_prefix, keepalive]):
+    if not all([endpoint, allowed_ips, subnet_prefix]):
         flash(_t('flash.config_fields_required'), 'error')
         return redirect(url_for('clients_new'))
 
@@ -321,7 +321,15 @@ def clients_create():
         client_addr = _next_ip(iface_peers, subnet_prefix)
         client_name = name_input or f'Client-{client_addr.split("/")[0]}'
 
-        ok, err = svc.register_peer(api, pub_key, client_addr, client_name, iface, keepalive)
+        extra = {
+            'private-key': priv_key,
+            'client-address': client_addr,
+            'client-endpoint': endpoint,
+            'client-allowed-address': allowed_ips,
+            'client-keepalive': keepalive,
+            'client-dns': dns or '',
+        }
+        ok, err = svc.register_peer(api, pub_key, client_addr, client_name, iface, keepalive, extra)
         svc.close(api)
         if not ok:
             flash(_t('flash.peer_registration_failed', error=err), 'error')
@@ -395,13 +403,36 @@ def clients_edit():
 def clients_update():
     peer_id = request.form.get('peer_id', '')
     interface = request.form.get('interface', '')
-    fields = {
-        'name': request.form.get('name', '').strip(),
-        'comment': request.form.get('comment', '').strip(),
-        'allowed-address': request.form.get('allowed_address', '').strip(),
-        'persistent-keepalive': request.form.get('persistent_keepalive', '').strip(),
-    }
-    fields = {k: v for k, v in fields.items() if v or k == 'comment'}
+
+    # All clearable fields — send whatever the form provides (empty = clear on router)
+    _map = [
+        ('name',                  'name'),
+        ('comment',               'comment'),
+        ('allowed_address',       'allowed-address'),
+        ('persistent_keepalive',  'persistent-keepalive'),
+        ('endpoint_address',      'endpoint-address'),
+        ('endpoint_port',         'endpoint-port'),
+        ('client_address',        'client-address'),
+        ('client_dns',            'client-dns'),
+        ('client_endpoint',       'client-endpoint'),
+        ('client_keepalive',      'client-keepalive'),
+        ('client_listen_port',    'client-listen-port'),
+        ('client_allowed_address','client-allowed-address'),
+    ]
+    fields = {api_key: request.form.get(form_key, '').strip() for form_key, api_key in _map}
+
+    # Responder is a checkbox — needs sentinel pattern
+    if 'responder_sent' in request.form:
+        fields['responder'] = 'true' if request.form.get('responder') else 'false'
+
+    # Preshared key only if explicitly entered (blank = don't touch existing key)
+    psk = request.form.get('preshared_key', '').strip()
+    if psk:
+        fields['preshared-key'] = psk
+
+    if not fields.get('name'):
+        flash('Name cannot be empty.', 'error')
+        return redirect(url_for('clients_edit', peer_id=peer_id, interface=interface))
     try:
         svc = MikrotikApiService(session)
         api = svc.connect()
@@ -417,6 +448,49 @@ def clients_update():
     except Exception as e:
         flash(_t('flash.client_update_failed', error=str(e)), 'error')
     return redirect(url_for('clients_index', interface=interface) if interface else url_for('clients_index'))
+
+
+@app.route('/clients/config')
+@require_login
+def clients_config():
+    peer_id = request.args.get('peer_id', '')
+    back_interface = request.args.get('interface', '')
+    try:
+        svc = MikrotikApiService(session)
+        api = svc.connect()
+        if not api:
+            flash(_t('flash.mikrotik_connection_failed'), 'error')
+            return redirect(url_for('clients_index'))
+        peer = svc.get_peer(api, peer_id)
+        if not peer:
+            svc.close(api)
+            flash('Peer not found.', 'error')
+            return redirect(url_for('clients_index'))
+        server_pubkey = svc.fetch_server_public_key(api, peer.get('interface', ''))
+        svc.close(api)
+
+        priv_key = peer.get('private-key', '')
+        if not priv_key:
+            flash('Private key not stored for this peer — config cannot be regenerated.', 'error')
+            return redirect(url_for('clients_edit', peer_id=peer_id, interface=back_interface))
+
+        client_addr = peer.get('client-address', '') or peer.get('allowed-address', '')
+        endpoint   = peer.get('client-endpoint', '')
+        dns        = peer.get('client-dns', '') or None
+        allowed_ips= peer.get('client-allowed-address', '0.0.0.0/0')
+        keepalive  = (peer.get('client-keepalive', '') or peer.get('persistent-keepalive', '')).rstrip('s')
+
+        cfg = _generate_config(priv_key, client_addr, server_pubkey or '', endpoint, allowed_ips, keepalive, dns)
+        qr  = _generate_qr(cfg)
+        return render_template('clients_config.html',
+            peer=peer,
+            client_config=cfg,
+            qr_code=qr,
+            back_interface=back_interface,
+        )
+    except Exception as e:
+        flash(str(e), 'error')
+        return redirect(url_for('clients_index'))
 
 
 @app.route('/clients/fetch_wireguard_address')

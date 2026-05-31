@@ -172,14 +172,17 @@
             </div>
 
             <div class="space-y-3">
-              <label class="flex items-center space-x-2 text-sm font-semibold text-purple-800">
-                <i class="bi bi-clock"></i>
-                <span>{{ t('new_client.config_section.keepalive_label') }}</span>
-              </label>
-              <input type="number" name="persistent_keepalive"
-                     value="25" min="0" max="65535" placeholder="25"
-                     class="w-full px-4 py-3 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white transition-all duration-200 font-mono"
-                     required>
+              <div class="flex items-center space-x-2">
+                <input type="checkbox" id="ka_toggle_new" checked
+                       class="w-4 h-4 text-purple-600 rounded"
+                       onchange="toggleKa('ka_input_new', this)">
+                <label for="ka_toggle_new" class="text-sm font-semibold text-purple-800">
+                  <i class="bi bi-clock mr-1"></i>{{ t('new_client.config_section.keepalive_label') }}
+                </label>
+              </div>
+              <input type="number" name="persistent_keepalive" id="ka_input_new"
+                     value="25" min="1" max="65535" placeholder="25"
+                     class="w-full px-4 py-3 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white transition-all duration-200 font-mono">
               <p class="text-xs text-purple-600 bg-purple-50 px-3 py-1 rounded">{{ t('new_client.config_section.keepalive_note') }}</p>
             </div>
 
@@ -228,4 +231,14 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleKa(inputId, cb) {
+  const inp = document.getElementById(inputId);
+  if (cb.checked) { inp.classList.remove('hidden'); if (!inp.value) inp.value = '25'; }
+  else             { inp.classList.add('hidden');    inp.value = ''; }
+}
+</script>
 {% endblock %}

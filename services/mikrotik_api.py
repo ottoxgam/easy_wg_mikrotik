@@ -52,15 +52,19 @@ class MikrotikApiService:
         except Exception:
             return []
 
-    def register_peer(self, api, public_key, client_address, client_name, interface_name, keepalive):
+    def register_peer(self, api, public_key, client_address, client_name, interface_name, keepalive, extra=None):
+        params = {
+            'name': client_name,
+            'interface': interface_name,
+            'public-key': public_key,
+            'allowed-address': client_address,
+        }
+        if keepalive:
+            params['persistent-keepalive'] = str(keepalive)
+        if extra:
+            params.update({k: v for k, v in extra.items() if v})
         try:
-            tuple(api('/interface/wireguard/peers/add', **{
-                'name': client_name,
-                'interface': interface_name,
-                'public-key': public_key,
-                'allowed-address': client_address,
-                'persistent-keepalive': str(keepalive),
-            }))
+            tuple(api('/interface/wireguard/peers/add', **params))
             return True, None
         except Exception as e:
             return False, str(e)
