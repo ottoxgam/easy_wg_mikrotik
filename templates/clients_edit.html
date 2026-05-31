@@ -22,7 +22,7 @@
     <input type="hidden" name="peer_id" value="{{ peer['.id'] }}">
     <input type="hidden" name="interface" value="{{ back_interface or peer.get('interface', '') }}">
 
-    {{/* ── Identity ───────────────────────────────── */}}
+    {# ── Identity ───────────────────────────────── #}
     <div class="bg-white/80 rounded border border-gray-300 overflow-hidden">
       <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex items-center space-x-2">
         <i class="bi bi-tag text-gray-500"></i>
@@ -55,7 +55,7 @@
       </div>
     </div>
 
-    {{/* ── Router-side network ─────────────────────── */}}
+    {# ── Router-side network ─────────────────────── #}
     <div class="bg-white/80 rounded border border-gray-300 overflow-hidden">
       <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex items-center space-x-2">
         <i class="bi bi-router text-gray-500"></i>
@@ -93,7 +93,7 @@
       </div>
     </div>
 
-    {{/* ── Client-side config (stored on router) ───── */}}
+    {# ── Client-side config (stored on router) ───── #}
     <div class="bg-white/80 rounded border border-gray-300 overflow-hidden">
       <div class="px-6 py-3 bg-blue-50 border-b border-blue-100 flex items-center space-x-2">
         <i class="bi bi-phone text-blue-500"></i>
