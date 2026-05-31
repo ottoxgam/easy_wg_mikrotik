@@ -157,6 +157,7 @@ zh:
     status:
       active: "活跃"
       waiting: "等待"
+      disconnected: "已断开"
     fields:
       ip_address: "IP 地址"
       public_key: "公钥"
@@ -165,6 +166,11 @@ zh:
       never_connected: "从未连接"
       not_set: "未设置"
       seconds: "秒"
+      name: "名称"
+      comment: "备注"
+      comment_placeholder: "可选备注"
+    edit_client: "编辑"
+    save_button: "保存更改"
     delete_client: "删除客户端"
     delete_confirm: "您确定要删除 \"%{name}\" 客户端吗？\n\n此操作无法撤销。"
     stats:
@@ -182,6 +188,8 @@ zh:
     required_fields: "请填写所有字段。"
     mikrotik_connection_failed: "连接 MikroTik 失败。"
     client_created: "客户端创建成功！"
+    client_updated: "客户端已更新。"
+    client_update_failed: "更新客户端失败: %{error}"
     client_deleted: "客户端删除成功。"
     client_delete_failed: "删除客户端失败: %{error}"
     no_wireguard_interfaces: "未找到 WireGuard 接口。请先在 MikroTik 中创建 WireGuard 接口。"

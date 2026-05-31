@@ -68,6 +68,8 @@ en:
     required_fields: "Please fill in all fields."
     mikrotik_connection_failed: "Failed to connect to MikroTik."
     client_created: "New client created successfully!"
+    client_updated: "Client updated."
+    client_update_failed: "Failed to update client: %{error}"
     client_deleted: "Client deleted successfully."
     client_delete_failed: "Failed to delete client: %{error}"
     no_wireguard_interfaces: "No WireGuard interfaces found. Please create a WireGuard interface in MikroTik first."
@@ -178,6 +180,7 @@ en:
     status:
       active: "Active"
       waiting: "Waiting"
+      disconnected: "Disconnected"
     fields:
       ip_address: "IP Address"
       public_key: "Public Key"
@@ -186,6 +189,11 @@ en:
       never_connected: "Never Connected"
       not_set: "Not Set"
       seconds: "sec"
+      name: "Name"
+      comment: "Comment"
+      comment_placeholder: "Optional note"
+    edit_client: "Edit"
+    save_button: "Save Changes"
     delete_client: "Delete Client"
     delete_confirm: "Are you sure you want to delete \"%{name}\" client?\n\nThis action cannot be undone."
     stats:

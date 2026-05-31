@@ -157,6 +157,7 @@ ja:
     status:
       active: "アクティブ"
       waiting: "待機中"
+      disconnected: "切断"
     fields:
       ip_address: "IPアドレス"
       public_key: "公開鍵"
@@ -165,6 +166,11 @@ ja:
       never_connected: "接続したことがありません"
       not_set: "設定されていません"
       seconds: "秒"
+      name: "名前"
+      comment: "コメント"
+      comment_placeholder: "任意メモ"
+    edit_client: "編集"
+    save_button: "保存"
     delete_client: "クライアントを削除"
     delete_confirm: "\"%{name}\"クライアントを削除してもよろしいですか？\n\nこの操作は元に戻せません。"
     stats:
@@ -182,6 +188,8 @@ ja:
     required_fields: "すべてのフィールドを入力してください。"
     mikrotik_connection_failed: "MikroTikへの接続に失敗しました。"
     client_created: "クライアントが正常に作成されました！"
+    client_updated: "クライアントを更新しました。"
+    client_update_failed: "クライアントの更新に失敗しました: %{error}"
     client_deleted: "クライアントが正常に削除されました。"
     client_delete_failed: "クライアントの削除に失敗しました: %{error}"
     no_wireguard_interfaces: "WireGuard インターフェースが見つかりません。まず MikroTik で WireGuard インターフェースを作成してください。"

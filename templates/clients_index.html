@@ -94,10 +94,15 @@
                 </div>
               </div>
 
-              {% if peer.get('last-handshake') %}
+              {% if peer['_status'] == 'active' %}
               <div class="flex items-center space-x-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
                 <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 <span>{{ t('clients.status.active') }}</span>
+              </div>
+              {% elif peer['_status'] == 'disconnected' %}
+              <div class="flex items-center space-x-1 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
+                <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse-slow"></div>
+                <span>{{ t('clients.status.disconnected') }}</span>
               </div>
               {% else %}
               <div class="flex items-center space-x-1 px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">
@@ -106,6 +111,9 @@
               </div>
               {% endif %}
             </div>
+            {% if peer.get('comment') %}
+            <p class="text-xs italic text-gray-400 mt-1">{{ peer['comment'] }}</p>
+            {% endif %}
           </div>
 
           <div class="p-6 space-y-4">
@@ -154,10 +162,16 @@
             </div>
           </div>
 
-          <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-xl">
+          <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-xl flex gap-2">
+            <a href="{{ url_for('clients_edit', peer_id=peer['.id'], interface=selected_interface) }}"
+               class="flex-1 flex items-center justify-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded transition-all duration-200">
+              <i class="bi bi-pencil mr-2"></i>
+              <span>{{ t('clients.edit_client') }}</span>
+            </a>
             <form method="POST" action="{{ url_for('clients_delete') }}"
                   data-confirm="{{ t('clients.delete_confirm', name=peer.get('name') or peer['.id']) }}"
-                  onsubmit="return confirm(this.dataset.confirm)">
+                  onsubmit="return confirm(this.dataset.confirm)"
+                  class="flex-1">
               <input type="hidden" name="peer_id" value="{{ peer['.id'] }}">
               {% if selected_interface %}
               <input type="hidden" name="interface" value="{{ selected_interface }}">

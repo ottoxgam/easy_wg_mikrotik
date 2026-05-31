@@ -157,6 +157,7 @@ ko:
     status:
       active: "활성"
       waiting: "대기"
+      disconnected: "연결 끊김"
     fields:
       ip_address: "IP 주소"
       public_key: "공개키"
@@ -165,6 +166,11 @@ ko:
       never_connected: "연결된 적 없음"
       not_set: "설정안함"
       seconds: "초"
+      name: "이름"
+      comment: "메모"
+      comment_placeholder: "선택 메모"
+    edit_client: "편집"
+    save_button: "저장"
     delete_client: "클라이언트 삭제"
     delete_confirm: "정말로 \"%{name}\" 클라이언트를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다."
     stats:
@@ -182,6 +188,8 @@ ko:
     required_fields: "모든 필드를 입력해주세요."
     mikrotik_connection_failed: "MikroTik 연결에 실패했습니다."
     client_created: "새 클라이언트가 성공적으로 생성되었습니다!"
+    client_updated: "클라이언트가 업데이트되었습니다."
+    client_update_failed: "클라이언트 업데이트에 실패했습니다: %{error}"
     client_deleted: "클라이언트가 성공적으로 삭제되었습니다."
     client_delete_failed: "클라이언트 삭제에 실패했습니다: %{error}"
     no_wireguard_interfaces: "WireGuard 인터페이스가 없습니다. MikroTik에서 WireGuard 인터페이스를 먼저 생성해주세요."

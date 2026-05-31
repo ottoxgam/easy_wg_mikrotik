@@ -38,10 +38,22 @@
           <h1 class="wg-logo-text">
             <a href="{{ url_for('index') }}" class="transition-all duration-300">{{ t('app.name') }}</a>
           </h1>
-          <div style="display:inline-block;transform:scale(0.75);">
-            <a href="https://www.buymeacoffee.com/rubyonstudio"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=rubyonstudio&button_colour=FF5F5F&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00"></a>
-          </div>
         </div>
+
+        {% if session.get('mikrotik_host') %}
+        <nav class="hidden sm:flex items-center space-x-1">
+          <a href="{{ url_for('clients_new') }}"
+             class="px-3 py-2 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded-md transition-colors flex items-center space-x-1">
+            <i class="bi bi-plus-circle"></i>
+            <span>{{ t('nav.new_client') }}</span>
+          </a>
+          <a href="{{ url_for('clients_index') }}"
+             class="px-3 py-2 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded-md transition-colors flex items-center space-x-1">
+            <i class="bi bi-list-ul"></i>
+            <span>{{ t('nav.clients') }}</span>
+          </a>
+        </nav>
+        {% endif %}
 
         <div class="flex items-center space-x-4">
           <div class="relative" data-controller="dropdown">

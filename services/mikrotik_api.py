@@ -72,6 +72,19 @@ class MikrotikApiService:
         except Exception as e:
             return False, str(e)
 
+    def get_peer(self, api, peer_id):
+        try:
+            return next((p for p in api('/interface/wireguard/peers/print') if p.get('.id') == peer_id), None)
+        except Exception:
+            return None
+
+    def update_peer(self, api, peer_id, fields):
+        try:
+            tuple(api('/interface/wireguard/peers/set', **{'.id': peer_id, **fields}))
+            return True, None
+        except Exception as e:
+            return False, str(e)
+
     def get_ip_addresses(self, api):
         try:
             return list(api('/ip/address/print'))

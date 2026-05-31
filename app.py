@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import base64
 import io
@@ -84,6 +85,23 @@ def require_login(f):
 
 
 START_IP = 2
+
+
+def _parse_ros_duration(s):
+    total = 0
+    for val, unit in re.findall(r'(\d+)([wdhms])', s):
+        total += int(val) * {'w': 604800, 'd': 86400, 'h': 3600, 'm': 60, 's': 1}[unit]
+    return total
+
+
+def _peer_status(peer):
+    handshake = peer.get('last-handshake', '')
+    if not handshake:
+        return 'waiting'
+    try:
+        return 'active' if _parse_ros_duration(handshake) < 120 else 'disconnected'
+    except Exception:
+        return 'disconnected'
 
 
 def _generate_keypair():
@@ -229,7 +247,8 @@ def clients_index():
         if api:
             interfaces = svc.fetch_wireguard_interfaces(api)
             all_peers = svc.get_peers(api)
-            peers = [p for p in all_peers if p.get('interface') == selected] if selected else all_peers
+            filtered = [p for p in all_peers if p.get('interface') == selected] if selected else all_peers
+            peers = [dict(p, _status=_peer_status(p)) for p in filtered]
             svc.close(api)
         else:
             flash(_t('flash.mikrotik_connection_failed'), 'error')
@@ -344,6 +363,57 @@ def clients_delete():
     if interface:
         return redirect(url_for('clients_index', interface=interface))
     return redirect(url_for('clients_index'))
+
+
+@app.route('/clients/edit')
+@require_login
+def clients_edit():
+    peer_id = request.args.get('peer_id', '')
+    try:
+        svc = MikrotikApiService(session)
+        api = svc.connect()
+        if not api:
+            flash(_t('flash.mikrotik_connection_failed'), 'error')
+            return redirect(url_for('clients_index'))
+        peer = svc.get_peer(api, peer_id)
+        svc.close(api)
+        if not peer:
+            flash('Peer not found.', 'error')
+            return redirect(url_for('clients_index'))
+        return render_template('clients_edit.html', peer=peer,
+                               back_interface=request.args.get('interface'))
+    except Exception as e:
+        flash(str(e), 'error')
+        return redirect(url_for('clients_index'))
+
+
+@app.route('/clients/update', methods=['POST'])
+@require_login
+def clients_update():
+    peer_id = request.form.get('peer_id', '')
+    interface = request.form.get('interface', '')
+    fields = {
+        'name': request.form.get('name', '').strip(),
+        'comment': request.form.get('comment', '').strip(),
+        'allowed-address': request.form.get('allowed_address', '').strip(),
+        'persistent-keepalive': request.form.get('persistent_keepalive', '').strip(),
+    }
+    fields = {k: v for k, v in fields.items() if v or k == 'comment'}
+    try:
+        svc = MikrotikApiService(session)
+        api = svc.connect()
+        if not api:
+            flash(_t('flash.mikrotik_connection_failed'), 'error')
+            return redirect(url_for('clients_index'))
+        ok, err = svc.update_peer(api, peer_id, fields)
+        svc.close(api)
+        if ok:
+            flash(_t('flash.client_updated'), 'success')
+        else:
+            flash(_t('flash.client_update_failed', error=err), 'error')
+    except Exception as e:
+        flash(_t('flash.client_update_failed', error=str(e)), 'error')
+    return redirect(url_for('clients_index', interface=interface) if interface else url_for('clients_index'))
 
 
 @app.route('/clients/fetch_wireguard_address')
