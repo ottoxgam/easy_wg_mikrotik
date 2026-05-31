@@ -114,10 +114,16 @@
       <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div class="wg-form-group">
           <label class="wg-label">{{ t('clients.fields.client_endpoint') }}</label>
-          <input type="text" name="endpoint"
-                 placeholder="{{ t('new_client.config_section.endpoint_placeholder') }}"
+          <input type="text" name="endpoint_host"
+                 placeholder="your-server.com"
                  class="wg-input font-mono" required>
           <p class="text-xs text-gray-400 mt-1">{{ t('new_client.config_section.endpoint_note') }}</p>
+        </div>
+        <div class="wg-form-group">
+          <label class="wg-label">{{ t('clients.fields.client_listen_port') }}</label>
+          <input type="number" name="endpoint_port_client"
+                 placeholder="51820" min="1" max="65535"
+                 class="wg-input font-mono">
         </div>
         <div class="wg-form-group">
           <label class="wg-label">{{ t('clients.fields.client_allowed_address') }}</label>

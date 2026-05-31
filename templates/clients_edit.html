@@ -111,8 +111,10 @@
         </div>
         <div class="wg-form-group">
           <label class="wg-label">{{ t('clients.fields.client_endpoint') }}</label>
-          <input type="text" name="client_endpoint" value="{{ peer.get('client-endpoint', '') }}"
-                 placeholder="host:port" class="wg-input font-mono">
+          <input type="text" name="client_endpoint_host"
+                 value="{{ peer.get('client-endpoint', '') }}"
+                 placeholder="your-server.com"
+                 class="wg-input font-mono">
         </div>
         <div class="wg-form-group">
           <label class="wg-label">{{ t('clients.fields.client_dns') }}</label>

@@ -289,7 +289,10 @@ def clients_new():
 @require_login
 def clients_create():
     iface = request.form.get('interface_name', '').strip()
-    endpoint = request.form.get('endpoint', '').strip()
+    _ep_host = request.form.get('endpoint_host', '').strip()
+    _ep_port = request.form.get('endpoint_port_client', '').strip()
+    # combine only for .conf file generation; stored separately on the router
+    endpoint = f'{_ep_host}:{_ep_port}' if _ep_host and _ep_port else _ep_host
     allowed_ips = request.form.get('allowed_ips', '').strip()
     subnet_prefix = '.'.join(request.form.get('subnet_prefix', '').strip().split('.')[:3])
     keepalive = request.form.get('persistent_keepalive', '').strip()
@@ -328,11 +331,11 @@ def clients_create():
             'private-key': priv_key,
             'comment': comment,
             'client-address': client_addr,
-            'client-endpoint': endpoint,
+            'client-endpoint': _ep_host,        # hostname only
+            'client-listen-port': _ep_port,     # port separate
             'client-allowed-address': allowed_ips,
             'client-keepalive': client_keepalive or keepalive,
             'client-dns': dns or '',
-            'client-listen-port': client_listen_port,
         }
         ok, err = svc.register_peer(api, pub_key, client_addr, client_name, iface, keepalive, extra)
         svc.close(api)
@@ -419,7 +422,7 @@ def clients_update():
         ('endpoint_port',         'endpoint-port'),
         ('client_address',        'client-address'),
         ('client_dns',            'client-dns'),
-        ('client_endpoint',       'client-endpoint'),
+        ('client_endpoint_host',  'client-endpoint'),
         ('client_keepalive',      'client-keepalive'),
         ('client_listen_port',    'client-listen-port'),
         ('client_allowed_address','client-allowed-address'),
@@ -480,7 +483,9 @@ def clients_config():
             return redirect(url_for('clients_edit', peer_id=peer_id, interface=back_interface))
 
         client_addr = peer.get('client-address', '') or peer.get('allowed-address', '')
-        endpoint   = peer.get('client-endpoint', '')
+        _ep_host   = peer.get('client-endpoint', '')
+        _ep_port   = peer.get('client-listen-port', '')
+        endpoint   = f'{_ep_host}:{_ep_port}' if _ep_host and _ep_port else _ep_host
         dns        = peer.get('client-dns', '') or None
         allowed_ips= peer.get('client-allowed-address', '0.0.0.0/0')
         keepalive  = (peer.get('client-keepalive', '') or peer.get('persistent-keepalive', '')).rstrip('s')

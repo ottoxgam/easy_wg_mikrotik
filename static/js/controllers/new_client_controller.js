@@ -54,9 +54,13 @@ export default class extends Controller {
         })
         .catch(() => {})
 
-      const endpointInput = this.element.querySelector("input[name='endpoint']")
-      if (endpointInput && selectedInterface.listen_port) {
-        endpointInput.value = `${this.serverAddressValue}:${selectedInterface.listen_port}`
+      const endpointHostInput = this.element.querySelector("input[name='endpoint_host']")
+      if (endpointHostInput && this.serverAddressValue) {
+        endpointHostInput.value = this.serverAddressValue
+      }
+      const endpointPortInput = this.element.querySelector("input[name='endpoint_port_client']")
+      if (endpointPortInput && selectedInterface.listen_port) {
+        endpointPortInput.value = selectedInterface.listen_port
       }
 
       this.interfaceInfoTarget.classList.remove('hidden')
