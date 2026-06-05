@@ -1,0 +1,11 @@
+services:
+  easy-wg-mikrotik:
+    build: .
+    container_name: easy-wg-mikrotik
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
